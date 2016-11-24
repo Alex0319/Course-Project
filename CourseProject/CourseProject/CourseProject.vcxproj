@@ -56,6 +56,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>comctl32.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,13 +80,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonController.h" />
     <ClInclude Include="CourseProject.h" />
+    <ClInclude Include="PlayingField.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonController.cpp" />
     <ClCompile Include="CourseProject.cpp" />
+    <ClCompile Include="PlayingField.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -95,6 +100,14 @@
     <ResourceCompile Include="CourseProject.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\bitmap1.bmp" />
+    <Image Include="..\HomeImage.bmp">
+      <DeploymentContent>false</DeploymentContent>
+    </Image>
+    <Image Include="..\PlayImage.bmp" />
+    <Image Include="..\PlayImage2.bmp" />
+    <Image Include="..\ReturnImage.bmp" />
+    <Image Include="1010.ico" />
     <Image Include="CourseProject.ico" />
     <Image Include="small.ico" />
   </ItemGroup>

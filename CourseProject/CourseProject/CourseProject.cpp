@@ -2,9 +2,11 @@
 //
 
 #include "stdafx.h"
-#include "CourseProject.h"
 
 #define MAX_LOADSTRING 100
+
+const int windowWidth = 500,windowHeight=300;
+ButtonController* buttonController;
 
 // Глобальные переменные:
 HINSTANCE hInst;								// текущий экземпляр
@@ -73,9 +75,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
-	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_COURSEPROJECT));
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAMEICON));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
+	wcex.hbrBackground	= (HBRUSH)(30);
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_COURSEPROJECT);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -98,9 +100,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    HWND hWnd;
 
    hInst = hInstance; // Сохранить дескриптор экземпляра в глобальной переменной
-
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+   int screenWidth = GetSystemMetrics(SM_CXSCREEN), screenHeight = GetSystemMetrics(SM_CYSCREEN);
+   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
+	   (screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -123,6 +125,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY	 - ввести сообщение о выходе и вернуться.
 //
 //
+
+void InitResources(HWND hWnd)
+{
+	buttonController = new ButtonController();
+}
+
+void FreeResources()
+{
+	delete buttonController;
+}
+
+void OnDrawItem()
+{
+
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -131,32 +149,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-	case WM_COMMAND:
-		wmId    = LOWORD(wParam);
-		wmEvent = HIWORD(wParam);
-		// Разобрать выбор в меню:
-		switch (wmId)
-		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+		case WM_CREATE: InitResources(hWnd);
 			break;
-		case IDM_EXIT:
-			DestroyWindow(hWnd);
+		case WM_COMMAND:
+			wmId    = LOWORD(wParam);
+			wmEvent = HIWORD(wParam);
+			// Разобрать выбор в меню:
+			switch (wmId)
+			{
+				case IDM_ABOUT:
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					break;
+				case IDM_EXIT:
+					DestroyWindow(hWnd);
+					break;
+				case IDM_PLAY:
+					break;
+				default:
+					return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+			break;
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &ps);
+			buttonController->UpdateMenuButtons(hWnd, hInst, hdc);
+			EndPaint(hWnd, &ps);
+			break;
+		case WM_DRAWITEM: OnDrawItem();
+			break;
+		case WM_DESTROY:
+			FreeResources();
+			PostQuitMessage(0);
 			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
-		}
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hWnd, &ps);
-		// TODO: добавьте любой код отрисовки...
-		EndPaint(hWnd, &ps);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
 }

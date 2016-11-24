@@ -30,12 +30,24 @@
     <ClInclude Include="CourseProject.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="PlayingField.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonController.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="CourseProject.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayingField.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="ButtonController.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -49,6 +61,24 @@
       <Filter>Файлы ресурсов</Filter>
     </Image>
     <Image Include="CourseProject.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="1010.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\PlayImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\HomeImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\PlayImage2.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\ReturnImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\bitmap1.bmp">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>
