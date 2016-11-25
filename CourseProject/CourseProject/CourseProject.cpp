@@ -12,9 +12,11 @@ ButtonController* buttonController;
 HINSTANCE hInst;								// текущий экземпляр
 TCHAR szTitle[MAX_LOADSTRING];					// Текст строки заголовка
 TCHAR szWindowClass[MAX_LOADSTRING];			// имя класса главного окна
+TCHAR szButtonClass[MAX_LOADSTRING];			
 
 // Отправить объявления функций, включенных в этот модуль кода:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
+ATOM				ButtonRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
@@ -34,7 +36,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	// Инициализация глобальных строк
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_COURSEPROJECT, szWindowClass, MAX_LOADSTRING);
+	LoadString(hInstance, IDC_APPBUTTON, szButtonClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
+	ButtonRegisterClass(hInstance);
 
 	// Выполнить инициализацию приложения:
 	if (!InitInstance (hInstance, nCmdShow))
@@ -75,7 +79,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAMEICON));
+	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAMEICON));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(30);
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_COURSEPROJECT);
@@ -85,6 +89,26 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
+ATOM ButtonRegisterClass(HINSTANCE hInstance)
+{
+	WNDCLASSEX wcex;
+
+	wcex.cbSize = sizeof(WNDCLASSEX);
+
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = NULL;
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wcex.lpszMenuName = NULL;
+	wcex.lpszClassName = szButtonClass;
+	wcex.hIconSm = NULL;
+
+	return RegisterClassEx(&wcex);
+}
 //
 //   ФУНКЦИЯ: InitInstance(HINSTANCE, int)
 //
@@ -173,8 +197,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hdc = BeginPaint(hWnd, &ps);
 			buttonController->UpdateMenuButtons(hWnd, hInst, hdc);
 			EndPaint(hWnd, &ps);
-			break;
-		case WM_DRAWITEM: OnDrawItem();
 			break;
 		case WM_DESTROY:
 			FreeResources();

@@ -23,13 +23,11 @@
 #endif
 
 #include <windows.h>
-#include <windowsx.h>
+#include <windowsx.h>	
 
 // Файлы заголовков C RunTime
 #include <stdlib.h>
 #include <commctrl.h>
-#include <ObjIdl.h>
-#include <gdiplus.h>
 #include <commdlg.h>
 #include <malloc.h>
 #include <memory.h>
@@ -38,7 +36,15 @@
 
 #include "CourseProject.h"
 #include "PlayingField.h"
+#include "Button.h"
+#include "PlayButton.h"
+#include "HomeButton.h"
+#include "ReturnButton.h"
 #include "ButtonController.h"
 
-using namespace Gdiplus;
+#include "ButtonFactory.h"
+#include "PlayButtonFactory.h"
+#include "HomeButtonFactory.h"
+#include "ReturnButtonFactory.h"
+
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

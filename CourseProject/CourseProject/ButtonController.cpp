@@ -10,7 +10,7 @@ ButtonController::~ButtonController()
 {
 }
 
-void ButtonController::CreateBitmapMask(HWND hWnd,HBITMAP hbmColor,HDC hdc, COLORREF crTransparent)
+void ButtonController::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, COLORREF crTransparent)
 {
 	HDC hdcMem, hdcMem2;
 	HBITMAP hbmMask;
@@ -37,11 +37,13 @@ void ButtonController::CreateBitmapMask(HWND hWnd,HBITMAP hbmColor,HDC hdc, COLO
 	DeleteObject(hdcMem2);
 }
 
-void ButtonController::UpdateMenuButtons(HWND hWnd, HINSTANCE hInst,HDC hdc)
+void ButtonController::UpdateMenuButtons(HWND hWnd, HINSTANCE hInst, HDC hdc)
 {
-//	for (int i = 0; i < 1; i++)
-//	{
-	
-		HBITMAP hBitmap = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_PLAY2));
-		CreateBitmapMask(hWnd,hBitmap,hdc,RGB(255,255,255));
+	//	for (int i = 0; i < 1; i++)
+	//	{
+
+	HBITMAP hBitmap = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_PLAY));
+	HWND hButton = CreateWindow(WC_BUTTON, NULL, WS_CHILD | WS_VISIBLE | BS_BITMAP,
+		0, 0, 200, 120, hWnd, (HMENU)100, hInst, 0);
+	CreateBitmapMask(hWnd, hBitmap, hdc, RGB(255, 255, 255));
 }
