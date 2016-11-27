@@ -32,19 +32,26 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <ctime>
 #include <map>
 
 #include "CourseProject.h"
+#include "BitmapModificator.h"
+#include "Block.h"
+#include "Figure.h"
+#include "Square.h"
+#include "HorizontalLine.h"
+#include "VerticalLine.h"
+#include "Angle.h"
+
+#include "FigureFactory.h"
+#include "SquareFactory.h"
+#include "HorizontalLineFactory.h"
+#include "VerticalLineFactory.h"
+#include "AngleFactory.h"
+
 #include "PlayingField.h"
 #include "Button.h"
-#include "PlayButton.h"
-#include "HomeButton.h"
-#include "ReturnButton.h"
 #include "ButtonController.h"
-
-#include "ButtonFactory.h"
-#include "PlayButtonFactory.h"
-#include "HomeButtonFactory.h"
-#include "ReturnButtonFactory.h"
 
 // TODO: Установите здесь ссылки на дополнительные заголовки, требующиеся для программы

@@ -3,14 +3,14 @@ class Button
 {
 	public:
 		Button();
-		Button(TCHAR*,HWND, HINSTANCE, LPCWSTR, int, int, int);
+		Button(HWND, HINSTANCE,DWORD, HBITMAP, int, int, int);
 		~Button();
+		HWND GetButtonHwnd();
+		BITMAP GetButtonBitmapInfo();
 //		virtual void HideButton(HDC hdc)=0;
-	protected:
+	private:
 		HBITMAP hBitmap;
 		HWND hButton;
 		BITMAP bitmapInfo;
-	private:
-		void CreateBitmapMask(HWND, HBITMAP, BITMAP, HDC, COLORREF);
 };
 

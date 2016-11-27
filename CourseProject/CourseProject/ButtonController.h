@@ -5,11 +5,12 @@ class ButtonController
 	public:
 		ButtonController();
 		~ButtonController();
-		void UpdateMenuButtons(HWND hWnd, HINSTANCE hInst, HDC hdc);
+		void CreateButtons(HWND, HINSTANCE);
+		void UpdateMenuButtons(HWND, HINSTANCE, HDC);
 	private:
-		int menuButtonsCount = 0;
-		const int closeButtonsCount = 4;
-		std::map <int, HWND> buttonsHwndMap;
-		void CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, COLORREF crTransparent);
+		const int mainMenuButtonsCount = 3;
+		const int closeButtonsCount = 3;
+		std::map <int, Button*> buttonsMap;
+		POINT GetButtonPosition(int, int*,int*, BITMAP);
 };
 

@@ -39,25 +39,40 @@
     <ClInclude Include="Button.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="PlayButton.h">
+    <ClInclude Include="BitmapModificator.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ButtonFactory.h">
+    <ClInclude Include="Block.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="PlayButtonFactory.h">
+    <ClInclude Include="Figure.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="HomeButton.h">
+    <ClInclude Include="Square.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ReturnButton.h">
+    <ClInclude Include="FigureFactory.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="HomeButtonFactory.h">
+    <ClInclude Include="SquareFactory.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ReturnButtonFactory.h">
+    <ClInclude Include="HorizontalLine.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="HorizontalLineFactory.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalLine.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="VerticalLineFactory.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Angle.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="AngleFactory.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,25 +92,40 @@
     <ClCompile Include="Button.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="PlayButton.cpp">
+    <ClCompile Include="BitmapModificator.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="ButtonFactory.cpp">
+    <ClCompile Include="Block.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="PlayButtonFactory.cpp">
+    <ClCompile Include="Figure.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="HomeButton.cpp">
+    <ClCompile Include="Square.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="ReturnButton.cpp">
+    <ClCompile Include="FigureFactory.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="HomeButtonFactory.cpp">
+    <ClCompile Include="SquareFactory.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="ReturnButtonFactory.cpp">
+    <ClCompile Include="HorizontalLine.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="HorizontalLineFactory.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalLine.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="VerticalLineFactory.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="Angle.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="AngleFactory.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,7 +156,16 @@
     <Image Include="..\ReturnImage.bmp">
       <Filter>Файлы ресурсов</Filter>
     </Image>
-    <Image Include="..\bitmap1.bmp">
+    <Image Include="..\CloseImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\RecordsImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\CupImage.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="..\sm.png">
       <Filter>Файлы ресурсов</Filter>
     </Image>
   </ItemGroup>

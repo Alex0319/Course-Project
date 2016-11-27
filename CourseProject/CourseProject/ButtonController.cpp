@@ -2,48 +2,62 @@
 
 ButtonController::ButtonController()
 {
-
 }
 
 
 ButtonController::~ButtonController()
 {
+	for (auto it = buttonsMap.begin(); it != buttonsMap.end(); it++)
+		delete it->second;
+	buttonsMap.clear();
 }
 
-void ButtonController::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, COLORREF crTransparent)
-{
-	HDC hdcMem, hdcMem2;
-	HBITMAP hbmMask;
-	BITMAP bm;
-	GetObject(hbmColor, sizeof(BITMAP), &bm);
-	hbmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
-	hdcMem = CreateCompatibleDC(hdc);
-	hdcMem2 = CreateCompatibleDC(hdc);
-
-	HBITMAP prevHbmColor = SelectBitmap(hdcMem, hbmColor);
-	HBITMAP prevHbmColor2 = SelectBitmap(hdcMem2, hbmMask);
-
-	SetBkColor(hdcMem, crTransparent);
-	BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
-	BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCINVERT);
-	BitBlt(hdc, 100, 50, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCAND);
-	BitBlt(hdc, 100, 50, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCPAINT);
-
-
-	SelectObject(hdcMem, prevHbmColor);
-	SelectObject(hdcMem2, prevHbmColor2);
-
-	DeleteObject(hdcMem);
-	DeleteObject(hdcMem2);
-}
 
 void ButtonController::UpdateMenuButtons(HWND hWnd, HINSTANCE hInst, HDC hdc)
 {
-	//	for (int i = 0; i < 1; i++)
-	//	{
+//	BitmapModificator::CreateBitmapMask(hWnd, hBitmap, hdc, RGB(255, 255, 255));
+}
 
-	HBITMAP hBitmap = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_PLAY));
-	HWND hButton = CreateWindow(WC_BUTTON, NULL, WS_CHILD | WS_VISIBLE | BS_BITMAP,
-		0, 0, 200, 120, hWnd, (HMENU)100, hInst, 0);
-	CreateBitmapMask(hWnd, hBitmap, hdc, RGB(255, 255, 255));
+POINT ButtonController::GetButtonPosition(int buttonId,int* x,int* y,BITMAP bitmapInfo)
+{
+	POINT buttonPosition;
+	switch (buttonId)
+	{
+		case IDM_PLAY:
+			*x = (WINDOW_WIDTH - bitmapInfo.bmWidth) / 2;
+			buttonPosition.x = *x;
+			buttonPosition.y = *y;
+			*y += bitmapInfo.bmHeight + 2;
+			break;
+		case IDM_RECORDS:
+			buttonPosition.x = *x;
+			buttonPosition.y = *y;
+			*x +=  bitmapInfo.bmWidth + 5;
+			break;
+		case IDM_CLOSE:
+			buttonPosition.x = *x;
+			buttonPosition.y = *y;
+			break;
+/*		case IDM_PLAY2:
+			*x = (WINDOW_WIDTH - bitmapInfo.bmWidth) / 2;
+			*y =  WINDOW_HEIGHT / 4;
+			break;*/
+		default:
+			break;
+	}
+	return buttonPosition;
+}
+
+void ButtonController::CreateButtons(HWND hwndParent, HINSTANCE hInst)
+{
+/*	int buttonStartCoordinateX = 0, buttonStartCoordinateY = WINDOW_HEIGHT / 3;
+	for (int i = 0; i < mainMenuButtonsCount; i++)
+	{
+		BITMAP bitmapInfo;
+		HBITMAP hBitmap = LoadBitmap(hInst, MAKEINTRESOURCE(MAKEINTRESOURCE(IDB_PLAY + i)));
+		GetObject(hBitmap, sizeof(BITMAP), &bitmapInfo);
+		POINT buttonPosition = GetButtonPosition(IDM_PLAY + i, &buttonStartCoordinateX, &buttonStartCoordinateY, bitmapInfo);
+		buttonsMap.insert(std::pair<int, Button*>(IDM_PLAY + i, new Button(hwndParent, hInst,WS_CHILD | WS_VISIBLE, hBitmap, buttonPosition.x, buttonPosition.y, IDM_PLAY + i)));
+	}*/
+
 }

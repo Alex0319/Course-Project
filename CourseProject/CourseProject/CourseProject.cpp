@@ -5,18 +5,16 @@
 
 #define MAX_LOADSTRING 100
 
-const int windowWidth = 500,windowHeight=300;
-ButtonController* buttonController;
-
 // Глобальные переменные:
 HINSTANCE hInst;								// текущий экземпляр
 TCHAR szTitle[MAX_LOADSTRING];					// Текст строки заголовка
 TCHAR szWindowClass[MAX_LOADSTRING];			// имя класса главного окна
-TCHAR szButtonClass[MAX_LOADSTRING];			
+
+PlayingField* playingField;
+int mouseX = 0, mouseY = 0;
 
 // Отправить объявления функций, включенных в этот модуль кода:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
-ATOM				ButtonRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
@@ -36,9 +34,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	// Инициализация глобальных строк
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_COURSEPROJECT, szWindowClass, MAX_LOADSTRING);
-	LoadString(hInstance, IDC_APPBUTTON, szButtonClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
-	ButtonRegisterClass(hInstance);
 
 	// Выполнить инициализацию приложения:
 	if (!InitInstance (hInstance, nCmdShow))
@@ -81,7 +77,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hInstance		= hInstance;
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_GAMEICON));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(30);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);;
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_COURSEPROJECT);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -89,26 +85,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-ATOM ButtonRegisterClass(HINSTANCE hInstance)
-{
-	WNDCLASSEX wcex;
-
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = NULL;
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = szButtonClass;
-	wcex.hIconSm = NULL;
-
-	return RegisterClassEx(&wcex);
-}
 //
 //   ФУНКЦИЯ: InitInstance(HINSTANCE, int)
 //
@@ -122,11 +98,10 @@ ATOM ButtonRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    HWND hWnd;
-
    hInst = hInstance; // Сохранить дескриптор экземпляра в глобальной переменной
    int screenWidth = GetSystemMetrics(SM_CXSCREEN), screenHeight = GetSystemMetrics(SM_CYSCREEN);
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME,
-	   (screenWidth - windowWidth) / 2, (screenHeight - windowHeight) / 2, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
+   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME,
+	   (screenWidth - WINDOW_WIDTH) / 2, (screenHeight - WINDOW_HEIGHT) / 2, WINDOW_WIDTH, WINDOW_HEIGHT, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -152,25 +127,36 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 void InitResources(HWND hWnd)
 {
-	buttonController = new ButtonController();
+	playingField = new PlayingField();
+
 }
 
 void FreeResources()
 {
-	delete buttonController;
+	delete playingField;
 }
 
-void OnDrawItem()
+void Drawing(HWND hWnd,int mouseX,int mouseY)
 {
-
+	RECT windowRect;
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hWnd, &ps);
+	HDC hdc2 = CreateCompatibleDC(hdc);
+	HBITMAP hbm = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+	HANDLE hold = SelectObject(hdc2, hbm);
+	GetClientRect(hWnd, &windowRect);
+	FillRect(hdc2, &windowRect, WHITE_BRUSH);
+	playingField->UpdatePlayingField(hdc2,mouseX,mouseY);
+	BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hdc2, 0, 0, SRCCOPY);
+	SelectObject(hdc2, hold);
+	EndPaint(hWnd, &ps);
+	DeleteObject(hbm);
+	DeleteDC(hdc2);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
-	PAINTSTRUCT ps;
-	HDC hdc;
-
 	switch (message)
 	{
 		case WM_CREATE: InitResources(hWnd);
@@ -184,19 +170,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case IDM_ABOUT:
 					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 					break;
-				case IDM_EXIT:
-					DestroyWindow(hWnd);
-					break;
 				case IDM_PLAY:
+					break;
+				case IDM_CLOSE:
+					DestroyWindow(hWnd);
 					break;
 				default:
 					return DefWindowProc(hWnd, message, wParam, lParam);
 			}
 			break;
-		case WM_PAINT:
-			hdc = BeginPaint(hWnd, &ps);
-			buttonController->UpdateMenuButtons(hWnd, hInst, hdc);
-			EndPaint(hWnd, &ps);
+		case WM_LBUTTONDOWN:
+			mouseX = GET_X_LPARAM(lParam);
+			mouseY = GET_Y_LPARAM(lParam);
+			if (playingField->CheckClientClick({ mouseX, mouseY }))
+				InvalidateRect(hWnd, NULL, FALSE);
+			break;
+		case WM_MOUSEMOVE:
+			mouseX = GET_X_LPARAM(lParam);
+			mouseY = GET_Y_LPARAM(lParam);
+			if (playingField->CheckFigureChoose())
+				InvalidateRect(hWnd, NULL, FALSE);
+			break;
+		case WM_LBUTTONUP:
+			break;
+		case WM_PAINT: Drawing(hWnd,mouseX,mouseY);
 			break;
 		case WM_DESTROY:
 			FreeResources();
