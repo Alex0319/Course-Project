@@ -7,13 +7,12 @@ PlayingField::PlayingField()
 	figureFactories.push_back(new HorizontalLineFactory);
 	figureFactories.push_back(new VerticalLineFactory);
 	figureFactories.push_back(new AngleFactory);
-	fieldRect = { BLOCK_SIZE, WINDOW_HEIGHT / 8, BLOCK_SIZE*(BLOCKS_COUNT + 1), PLAYING_FIELD };
+	fieldRect = { BLOCK_SIZE, FIELD_START, BLOCK_SIZE*(BLOCKS_COUNT + 1), PLAYING_FIELD };
 	hPen = GetStockPen(NULL_PEN);
 	for (int i = 0; i < BLOCKS_COUNT;i++)
 		for (int j = 0; j < BLOCKS_COUNT; j++)
 			blockTable[i][j] = DEFAULT;
 }
-
 
 PlayingField::~PlayingField()
 {
@@ -22,6 +21,42 @@ PlayingField::~PlayingField()
 	for (auto it = figureFactories.begin(); it != figureFactories.end();it++)
 		delete *it;
 	figureFactories.clear();
+}
+
+int PlayingField::SearchFullRows()
+{
+	int blocksCount=0,j=0;
+	for (int i = 0; i < BLOCKS_COUNT; i++)
+	{
+		for (j = 0; j < BLOCKS_COUNT; j++)
+			if (blockTable[i][j] == DEFAULT)
+				break;
+		if (j == BLOCKS_COUNT)
+		{
+			for (j = 0; j < BLOCKS_COUNT; j++)
+				blockTable[i][j] = DEFAULT;
+			blocksCount += BLOCKS_COUNT;
+		}
+	}
+	return blocksCount;
+}
+
+int PlayingField::SearchFullColumns()
+{
+	int blocksCount = 0, i = 0;
+	for (int j = 0; j < BLOCKS_COUNT; j++)
+	{
+		for (i = 0; i< BLOCKS_COUNT; i++)
+		if (blockTable[i][j] == DEFAULT)
+			break;
+		if (j == BLOCKS_COUNT)
+		{
+			for (j = 0; j < BLOCKS_COUNT; j++)
+				blockTable[i][j] = DEFAULT;
+			blocksCount += BLOCKS_COUNT;
+		}
+	}
+	return blocksCount;
 }
 
 void PlayingField::ClearFiguresVector()
@@ -98,7 +133,6 @@ void PlayingField::RepaintChooseFigure(HDC hdc,int mouseX,int mouseY)
 		}
 		int figureWidth = figureRect.right - figureRect.left, figureHeight = figureRect.bottom - figureRect.top;
 		chooseFigure->DrawFigure(hdc, mouseX - figureWidth / 2, mouseY - figureHeight - 2, BLOCK_SIZE - 2);
-
 	}
 }
 
@@ -119,16 +153,71 @@ void PlayingField::CreateNewFigures(HDC hdc)
 	}
 }
 
+int PlayingField::SearchMaxCloseValue(int sourceValue,int startPoint)
+{
+	int resultValue = startPoint;
+	for (int i = 0; i < BLOCKS_COUNT;i++)
+		if (resultValue < sourceValue)
+			resultValue += BLOCK_SIZE;
+		else
+		{
+			if (resultValue != BLOCK_SIZE && resultValue != FIELD_START)
+				resultValue -= BLOCK_SIZE;
+			break;
+		}
+		if (resultValue == PLAYING_FIELD || resultValue == BLOCK_SIZE*(BLOCKS_COUNT + 1))
+			resultValue -= BLOCK_SIZE;
+	return resultValue;
+}
+
+int PlayingField::GetRectArea(RECT rect)
+{
+	return (rect.right - rect.left)*(rect.bottom - rect.top);
+}
+
+int PlayingField::SearchStartBlockNumberForChooseFigure(RECT startFigureBlockRect,RECT figureRect,int row, int column)
+{
+	int blockNumber = 0,resultRectangleArea=0;
+	RECT currentFieldRect;
+	for (int i = row; (i < row+2) && (i<BLOCKS_COUNT); i++)
+		for (int j = column; (j < column + 2) && (j<BLOCKS_COUNT); j++)
+		if (IntersectRect(&currentFieldRect, &(blocks[i][j].GetFieldBlockRect()), &startFigureBlockRect))
+		{
+			int currentRectArea = GetRectArea(currentFieldRect);
+			if (resultRectangleArea < currentRectArea)
+			{
+				resultRectangleArea = currentRectArea;
+				blockNumber = i*BLOCKS_COUNT + j;
+				if (figureRect.right>fieldRect.right)
+					break;
+			}
+		}
+	return blockNumber;
+}
+
+int PlayingField::GetStartBlockNumberForChooseFigure(RECT figureRect,int x,int y)
+{
+	RECT startFigureBlockRect = { figureRect.left, figureRect.bottom - BLOCK_SIZE, figureRect.left + BLOCK_SIZE, figureRect.bottom };
+	int currentX = SearchMaxCloseValue(startFigureBlockRect.left, fieldRect.left), currentY = SearchMaxCloseValue(startFigureBlockRect.top, fieldRect.top);
+	int blockNumber = SearchStartBlockNumberForChooseFigure(startFigureBlockRect, figureRect, (currentY - fieldRect.top) / BLOCK_SIZE, (currentX - fieldRect.left) / BLOCK_SIZE);
+	return blockNumber;
+}
+
 void PlayingField::TrySetChoosingFigure(int x, int y)
 {
 	if (chooseFigure != NULL)
 	{
+		int blockNumber = 0,setBlockCount=0;
 		if (chooseFigure->CheckPlaceForFigure(fieldRect))
 		{
-			
-			RemoveFigure();
-			if (figures.size()==0)
-				fieldState = CREATE;
+			blockNumber = GetStartBlockNumberForChooseFigure(chooseFigure->GetFigureRect(), x, y);
+			if (setBlockCount=chooseFigure->SetFigureOnChoosePlace(blockTable, blockNumber))
+			{
+				setBlockCount += SearchFullRows() + SearchFullColumns();
+				RemoveFigure();
+				if (figures.empty())
+					fieldState = CREATE;
+			}
 		}
 		chooseFigure->SetRectStartPoint(oldFigureStartPoint.x, oldFigureStartPoint.y);
 		oldFigureStartPoint.x = 0;

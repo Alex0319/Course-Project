@@ -47,3 +47,10 @@ int Square::GetBlocksCountInRow()
 {
 	return sqrt(blocksCount);
 }
+
+int Square::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int blocksCountInRow = GetBlocksCountInRow();
+	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
+	return SetFigure(colorsTable, row, column, blocksCountInRow, blocksCountInRow);
+}

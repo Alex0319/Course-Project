@@ -17,6 +17,8 @@ int mouseX = 0, mouseY = 0;
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	SeeRecords(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK	AddRecord(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
@@ -167,10 +169,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// Разобрать выбор в меню:
 			switch (wmId)
 			{
-				case IDM_ABOUT:
-					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+				case IDM_RECORDS: DialogBox(hInst, MAKEINTRESOURCE(IDD_SEERECORDSBOX), hWnd, SeeRecords);
 					break;
 				case IDM_PLAY:
+					break;
+				case IDM_ABOUT: DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 					break;
 				case IDM_CLOSE:
 					DestroyWindow(hWnd);
@@ -211,22 +214,60 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+INT_PTR CALLBACK SeeRecords(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+		case WM_INITDIALOG:
+			return (INT_PTR)TRUE;
+
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDSEERECORDS_OK)
+			{
+				EndDialog(hDlg, LOWORD(wParam));
+				return (INT_PTR)TRUE;
+			}
+			break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK AddRecord(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+		case WM_INITDIALOG:
+			return (INT_PTR)TRUE;
+
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDRECORDS_CANCEL)
+			{
+				EndDialog(hDlg, LOWORD(wParam));
+				return (INT_PTR)TRUE;
+			}
+			break;
+	}
+	return (INT_PTR)FALSE;
+}
+
 // Обработчик сообщений для окна "О программе".
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 	switch (message)
 	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
+		case WM_INITDIALOG:
 			return (INT_PTR)TRUE;
-		}
-		break;
+
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+			{
+				EndDialog(hDlg, LOWORD(wParam));
+				return (INT_PTR)TRUE;
+			}
+			break;
 	}
 	return (INT_PTR)FALSE;
 }

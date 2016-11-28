@@ -38,6 +38,7 @@
 #include "CourseProject.h"
 #include "BitmapModificator.h"
 #include "Block.h"
+#include "FieldBlock.h"
 #include "Figure.h"
 #include "Square.h"
 #include "HorizontalLine.h"

@@ -43,3 +43,10 @@ void VerticalLine::DrawFigure(HDC hdc, int x, int y, int blockSize)
 	}
 	SetRectEndPoint(x + blockSize, y);
 }
+
+int VerticalLine::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int blocksCountInRow = GetBlocksCountInColumn();
+	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
+	return SetFigure(colorsTable, row, column, blocksCountInRow, GetBlocksCountInRow());
+}

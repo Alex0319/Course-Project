@@ -5,9 +5,8 @@ class Block
 		Block();
 		~Block();
 		void DrawBlock(HDC, COLORREF,int,int,int);
-	private:
+	protected:
 		const int ellipseSize = 8;
 		HBRUSH hBrush;
-
 };
 

@@ -43,3 +43,9 @@ void HorizontalLine::DrawFigure(HDC hdc, int x, int y,int blockSize)
 	}
 	SetRectEndPoint(x, y + blockSize);
 }
+
+int HorizontalLine::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int row = blockNumber / BLOCKS_COUNT, column = blockNumber % BLOCKS_COUNT;
+	return SetFigure(colorsTable, row, column, GetBlocksCountInColumn(), GetBlocksCountInRow());
+}
