@@ -8,10 +8,13 @@ class PlayingField
 		PlayingField();
 		~PlayingField();
 		void UpdatePlayingField(HDC,int,int);
+		void TrySetChoosingFigure(int, int);
 		bool CheckClientClick(POINT);
 		bool CheckFigureChoose();
 	private:
 		const int newFiguresCount = 3;
+		RECT fieldRect;
+		POINT oldFigureStartPoint;
 		HPEN hPen;
 		enum FieldState
 		{
@@ -28,4 +31,5 @@ class PlayingField
 		void RepaintChooseFigure(HDC,int,int);
 		void RepaintOtherFigures(HDC);
 		void ClearFiguresVector();
+		void RemoveFigure();
 };

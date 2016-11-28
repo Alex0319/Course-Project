@@ -26,3 +26,10 @@ RECT Figure::GetFigureRect()
 {
 	return figureRect;
 }
+
+bool Figure::CheckPlaceForFigure(RECT fieldRect)
+{
+	RECT resultRect;
+	if (!IntersectRect(&resultRect, &fieldRect, &figureRect))
+		return false;
+}

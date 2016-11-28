@@ -7,7 +7,8 @@ PlayingField::PlayingField()
 	figureFactories.push_back(new HorizontalLineFactory);
 	figureFactories.push_back(new VerticalLineFactory);
 	figureFactories.push_back(new AngleFactory);
-	hPen = GetStockPen(WHITE_PEN);
+	fieldRect = { BLOCK_SIZE, WINDOW_HEIGHT / 8, BLOCK_SIZE*(BLOCKS_COUNT + 1), PLAYING_FIELD };
+	hPen = GetStockPen(NULL_PEN);
 	for (int i = 0; i < BLOCKS_COUNT;i++)
 		for (int j = 0; j < BLOCKS_COUNT; j++)
 			blockTable[i][j] = DEFAULT;
@@ -31,9 +32,20 @@ void PlayingField::ClearFiguresVector()
 		std::vector<Figure*>().swap(figures);
 }
 
+void PlayingField::RemoveFigure()
+{
+	for (int i = 0; i < figures.size();i++)
+		if (chooseFigure == figures[i])
+		{
+			figures.erase(figures.begin() + i);
+			if (!figures.empty())
+				std::vector<Figure*>(figures).swap(figures);
+		}
+}
+
 void PlayingField::PaintPlayingField(HDC hdc)
 {
-	int currentX = BLOCK_SIZE, currentY = WINDOW_HEIGHT/8;
+	int currentX = fieldRect.left, currentY = fieldRect.top;
 	for (int i = 0; i < BLOCKS_COUNT; i++)
 	{
 		for (int j = 0; j < BLOCKS_COUNT; j++)
@@ -52,9 +64,6 @@ bool PlayingField::CheckClientClick(POINT point)
 		if (PtInRect(&(figures[i]->GetFigureRect()), point))
 		{
 			chooseFigure = figures[i];
-			figures.erase(figures.begin()+i);
-			std::vector<Figure*>(figures).swap(figures);
-			fieldState = REPAINT;
 			return true;
 		}
 	return false;
@@ -70,10 +79,11 @@ bool PlayingField::CheckFigureChoose()
 void PlayingField::RepaintOtherFigures(HDC hdc)
 {
 	for (int i=0; i<figures.size(); i++)
-	{
-		RECT figureRect = figures[i]->GetFigureRect();
-		figures[i]->DrawFigure(hdc, figureRect.left, figureRect.top, BLOCK_SIZE_SMALL);
-	}
+		if (chooseFigure == NULL || chooseFigure != figures[i])
+		{
+			RECT figureRect = figures[i]->GetFigureRect();
+			figures[i]->DrawFigure(hdc, figureRect.left, figureRect.top, BLOCK_SIZE_SMALL);
+		}
 }
 
 void PlayingField::RepaintChooseFigure(HDC hdc,int mouseX,int mouseY)
@@ -81,8 +91,14 @@ void PlayingField::RepaintChooseFigure(HDC hdc,int mouseX,int mouseY)
 	if (chooseFigure != NULL)
 	{
 		RECT figureRect = chooseFigure->GetFigureRect();
-		int figureWidth = figureRect.right-figureRect.left, figureHeight = figureRect.bottom - figureRect.top;
-		chooseFigure->DrawFigure(hdc,mouseX-figureWidth/2,mouseY-figureHeight-2,BLOCK_SIZE-2);
+		if (oldFigureStartPoint.x == 0 && oldFigureStartPoint.y == 0)
+		{
+			oldFigureStartPoint.x = figureRect.left;
+			oldFigureStartPoint.y = figureRect.top;
+		}
+		int figureWidth = figureRect.right - figureRect.left, figureHeight = figureRect.bottom - figureRect.top;
+		chooseFigure->DrawFigure(hdc, mouseX - figureWidth / 2, mouseY - figureHeight - 2, BLOCK_SIZE - 2);
+
 	}
 }
 
@@ -103,6 +119,23 @@ void PlayingField::CreateNewFigures(HDC hdc)
 	}
 }
 
+void PlayingField::TrySetChoosingFigure(int x, int y)
+{
+	if (chooseFigure != NULL)
+	{
+		if (chooseFigure->CheckPlaceForFigure(fieldRect))
+		{
+			
+			RemoveFigure();
+			if (figures.size()==0)
+				fieldState = CREATE;
+		}
+		chooseFigure->SetRectStartPoint(oldFigureStartPoint.x, oldFigureStartPoint.y);
+		oldFigureStartPoint.x = 0;
+		oldFigureStartPoint.y = 0;
+		chooseFigure = NULL;
+	}
+}
 
 void PlayingField::UpdatePlayingField(HDC hdc,int x,int y)
 {
@@ -112,6 +145,7 @@ void PlayingField::UpdatePlayingField(HDC hdc,int x,int y)
 		case CREATE:
 			PaintPlayingField(hdc);
 			CreateNewFigures(hdc);
+			fieldState = REPAINT;
 			break;
 		case REPAINT:
 			PaintPlayingField(hdc);

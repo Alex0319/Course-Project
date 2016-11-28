@@ -180,6 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		case WM_LBUTTONDOWN:
+			SetCapture(hWnd);
 			mouseX = GET_X_LPARAM(lParam);
 			mouseY = GET_Y_LPARAM(lParam);
 			if (playingField->CheckClientClick({ mouseX, mouseY }))
@@ -192,6 +193,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case WM_LBUTTONUP:
+			ReleaseCapture();
+			mouseX = GET_X_LPARAM(lParam);
+			mouseY = GET_Y_LPARAM(lParam);
+			playingField->TrySetChoosingFigure(mouseX, mouseY);
+			InvalidateRect(hWnd, NULL, FALSE);
 			break;
 		case WM_PAINT: Drawing(hWnd,mouseX,mouseY);
 			break;

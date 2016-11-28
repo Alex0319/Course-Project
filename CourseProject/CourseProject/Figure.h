@@ -8,12 +8,13 @@ class Figure
 		virtual int GetBlocksCountInColumn()=0;
 		virtual int GetBlocksCountInRow() = 0;
 		RECT GetFigureRect();
-	protected:
+		bool CheckPlaceForFigure(RECT);
+		void SetRectStartPoint(int, int);
+protected:
 		COLORREF figureColor;
 		int blocksCount;
 		Block figureBlock;
 		RECT figureRect;
-		void SetRectStartPoint(int, int);
 		void SetRectEndPoint(int, int);
 };
 
