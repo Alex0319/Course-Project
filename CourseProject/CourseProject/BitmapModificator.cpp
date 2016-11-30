@@ -9,12 +9,10 @@ BitmapModificator::~BitmapModificator()
 {
 }
 
-void BitmapModificator::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, COLORREF crTransparent)
+int BitmapModificator::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor,BITMAP bm, HDC hdc, COLORREF crTransparent,int x,int y)
 {
 	HDC hdcMem, hdcMem2;
 	HBITMAP hbmMask;
-	BITMAP bm;
-	GetObject(hbmColor, sizeof(BITMAP), &bm);
 	hbmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
 	hdcMem = CreateCompatibleDC(hdc);
 	hdcMem2 = CreateCompatibleDC(hdc);
@@ -25,8 +23,8 @@ void BitmapModificator::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, C
 	SetBkColor(hdcMem, crTransparent);
 	BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
 	BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCINVERT);
-	BitBlt(hdc, 100, 50, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCAND);
-	BitBlt(hdc, 100, 50, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCPAINT);
+	BitBlt(hdc, x - bm.bmWidth/2, y, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCAND);
+	BitBlt(hdc, x - bm.bmWidth / 2, y, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCPAINT);
 
 
 	SelectObject(hdcMem, prevHbmColor);
@@ -34,4 +32,5 @@ void BitmapModificator::CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, C
 
 	DeleteObject(hdcMem);
 	DeleteObject(hdcMem2);
+	return bm.bmWidth;
 }

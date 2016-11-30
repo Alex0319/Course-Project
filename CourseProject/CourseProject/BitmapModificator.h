@@ -4,6 +4,6 @@ class BitmapModificator
 	public:
 		BitmapModificator();
 		~BitmapModificator();
-		static void CreateBitmapMask(HWND hWnd, HBITMAP hbmColor, HDC hdc, COLORREF crTransparent);
+		static int CreateBitmapMask(HWND hWnd, HBITMAP hbmColor,BITMAP bm, HDC hdc, COLORREF crTransparent,int,int);
 };
 

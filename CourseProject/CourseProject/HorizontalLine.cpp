@@ -19,6 +19,11 @@ HorizontalLine::HorizontalLine()
 	}
 }
 
+HorizontalLine::HorizontalLine(std::string figureInfo) :Figure(figureInfo)
+{
+}
+
+
 HorizontalLine::~HorizontalLine()
 {
 }
@@ -48,4 +53,10 @@ int HorizontalLine::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUN
 {
 	int row = blockNumber / BLOCKS_COUNT, column = blockNumber % BLOCKS_COUNT;
 	return SetFigure(colorsTable, row, column, GetBlocksCountInColumn(), GetBlocksCountInRow());
+}
+
+bool HorizontalLine::CheckBlock(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int row = blockNumber / BLOCKS_COUNT, column = blockNumber % BLOCKS_COUNT;
+	return Check(colorsTable, row, column, GetBlocksCountInColumn(), GetBlocksCountInRow());
 }

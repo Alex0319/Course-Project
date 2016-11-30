@@ -3,7 +3,7 @@
 Square::Square()
 {
 	srand(time(0));
-	if (rand() % 3)
+	if (rand() % 4)
 	{
 		blocksCount = 4;
 		figureColor = BlockColors::LIGHTGREEN;
@@ -13,6 +13,10 @@ Square::Square()
 		blocksCount = 9;
 		figureColor = BlockColors::GREEN;
 	}
+}
+
+Square::Square(std::string figureInfo) :Figure(figureInfo)
+{
 }
 
 Square::~Square()
@@ -53,4 +57,11 @@ int Square::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int 
 	int blocksCountInRow = GetBlocksCountInRow();
 	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
 	return SetFigure(colorsTable, row, column, blocksCountInRow, blocksCountInRow);
+}
+
+bool Square::CheckBlock(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int blocksCountInRow = GetBlocksCountInRow();
+	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
+	return Check(colorsTable, row, column, blocksCountInRow, blocksCountInRow);
 }

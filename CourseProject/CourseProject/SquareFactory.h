@@ -5,5 +5,6 @@ class SquareFactory : public FigureFactory
 		SquareFactory();
 		~SquareFactory();
 		Figure* CreateFigure();
+		Figure* CreateFigure(std::string);
 };
 

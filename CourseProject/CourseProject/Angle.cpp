@@ -27,9 +27,24 @@ Angle::Angle()
 	blocksCountInColumn = 0.5*blocksCount + 0.5;
 }
 
+Angle::Angle(std::string figureInfo) :Figure(figureInfo)
+{
+	size_t position = figureInfo.find_last_of("_");
+	figureInfo.replace(0, position+1, "");
+	int type = atoi(figureInfo.c_str());
+	angleType = (AngleType)type;
+	blocksCountInColumn = 0.5*blocksCount + 0.5;
+}
 
 Angle::~Angle()
 {
+}
+
+std::string Angle::GetFigureProperties()
+{
+	char buffer[2];
+	_itoa_s(angleType,buffer,sizeof buffer,10);
+	return Figure::GetFigureProperties()+"_"+std::string(buffer);
 }
 
 void Angle::DrawLine(HDC hdc, int x, int y,int blocksCount,int blockSize)
@@ -89,6 +104,8 @@ int Angle::GetBlocksCountInRow()
 
 bool Angle::CheckBlocks(BlockColors(*colorsTable)[BLOCKS_COUNT], int* modificateIndex,int constIndex, int startBlockIndex,bool isRowIndex)
 {
+	if (startBlockIndex + blocksCountInColumn > BLOCKS_COUNT || *modificateIndex<0 || constIndex>BLOCKS_COUNT)
+		return false;
 	for (*modificateIndex = startBlockIndex; *modificateIndex < startBlockIndex + blocksCountInColumn; (*modificateIndex)++)
 		if (isRowIndex)
 		{
@@ -101,7 +118,7 @@ bool Angle::CheckBlocks(BlockColors(*colorsTable)[BLOCKS_COUNT], int* modificate
 	return true;
 }
 
-bool Angle::CheckPlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int row, int column, int blocksCountInRow, int blocksCountInColumn)
+bool Angle::Check(BlockColors(*colorsTable)[BLOCKS_COUNT], int row, int column, int blocksCountInRow, int blocksCountInColumn)
 {
 	int i = 0, j = 0;
 	switch (angleType)
@@ -126,7 +143,7 @@ void Angle::SetBlockColors(BlockColors(*colorsTable)[BLOCKS_COUNT], int* modific
 int Angle::SetFigure(BlockColors(*colorsTable)[BLOCKS_COUNT], int row, int column, int blocksCountInRow, int blocksCountInColumn)
 {
 	int i = 0, j = 0;
-	if (CheckPlace(colorsTable, row, column, blocksCountInRow, blocksCountInColumn))
+	if (Check(colorsTable, row, column, blocksCountInRow, blocksCountInColumn))
 	{
 		switch (angleType)
 		{
@@ -162,4 +179,16 @@ int Angle::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT], int b
 	else
 		column = blockNumber % BLOCKS_COUNT + blocksCount - 1;
 	return SetFigure(colorsTable, row, column, blocksCount, blocksCount);
+}
+
+bool Angle::CheckBlock(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int blocksCount = GetBlocksCountInRow();
+	int row = 0, column = 0;
+	row = blockNumber / BLOCKS_COUNT - blocksCount + 1;
+	if (angleType != RIGHTBOTTOM)
+		column = blockNumber % BLOCKS_COUNT;
+	else
+		column = blockNumber % BLOCKS_COUNT + blocksCount - 1;
+	return Check(colorsTable, row, column, blocksCount, blocksCount);
 }

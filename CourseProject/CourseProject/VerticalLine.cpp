@@ -19,6 +19,11 @@ VerticalLine::VerticalLine()
 	}
 }
 
+VerticalLine::VerticalLine(std::string figureInfo) :Figure(figureInfo)
+{
+
+}
+
 VerticalLine::~VerticalLine()
 {
 }
@@ -49,4 +54,11 @@ int VerticalLine::SetFigureOnChoosePlace(BlockColors(*colorsTable)[BLOCKS_COUNT]
 	int blocksCountInRow = GetBlocksCountInColumn();
 	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
 	return SetFigure(colorsTable, row, column, blocksCountInRow, GetBlocksCountInRow());
+}
+
+bool VerticalLine::CheckBlock(BlockColors(*colorsTable)[BLOCKS_COUNT], int blockNumber)
+{
+	int blocksCountInRow = GetBlocksCountInColumn();
+	int row = blockNumber / BLOCKS_COUNT - blocksCountInRow + 1, column = blockNumber % BLOCKS_COUNT;
+	return Check(colorsTable, row, column, blocksCountInRow, GetBlocksCountInRow());
 }

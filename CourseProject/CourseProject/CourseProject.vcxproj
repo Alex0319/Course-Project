@@ -84,14 +84,13 @@
     <ClInclude Include="AngleFactory.h" />
     <ClInclude Include="BitmapModificator.h" />
     <ClInclude Include="Block.h" />
-    <ClInclude Include="Button.h" />
-    <ClInclude Include="ButtonController.h" />
     <ClInclude Include="CourseProject.h" />
     <ClInclude Include="FieldBlock.h" />
     <ClInclude Include="Figure.h" />
     <ClInclude Include="FigureFactory.h" />
     <ClInclude Include="HorizontalLine.h" />
     <ClInclude Include="HorizontalLineFactory.h" />
+    <ClInclude Include="LoadSaveGameInfo.h" />
     <ClInclude Include="SquareFactory.h" />
     <ClInclude Include="PlayingField.h" />
     <ClInclude Include="Resource.h" />
@@ -106,14 +105,13 @@
     <ClCompile Include="AngleFactory.cpp" />
     <ClCompile Include="BitmapModificator.cpp" />
     <ClCompile Include="Block.cpp" />
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="ButtonController.cpp" />
     <ClCompile Include="CourseProject.cpp" />
     <ClCompile Include="FieldBlock.cpp" />
     <ClCompile Include="Figure.cpp" />
     <ClCompile Include="FigureFactory.cpp" />
     <ClCompile Include="HorizontalLine.cpp" />
     <ClCompile Include="HorizontalLineFactory.cpp" />
+    <ClCompile Include="LoadSaveGameInfo.cpp" />
     <ClCompile Include="SquareFactory.cpp" />
     <ClCompile Include="PlayingField.cpp" />
     <ClCompile Include="Square.cpp" />
@@ -128,16 +126,7 @@
     <ResourceCompile Include="CourseProject.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\CloseImage.bmp" />
     <Image Include="..\CupImage.bmp" />
-    <Image Include="..\HomeImage.bmp">
-      <DeploymentContent>false</DeploymentContent>
-    </Image>
-    <Image Include="..\PlayImage.bmp" />
-    <Image Include="..\PlayImage2.bmp" />
-    <Image Include="..\RecordsImage.bmp" />
-    <Image Include="..\ReturnImage.bmp" />
-    <Image Include="..\sm.png" />
     <Image Include="1010.ico" />
     <Image Include="CourseProject.ico" />
     <Image Include="small.ico" />

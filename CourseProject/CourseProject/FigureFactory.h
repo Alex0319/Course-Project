@@ -5,5 +5,6 @@ class FigureFactory
 		FigureFactory();
 		~FigureFactory();
 		virtual Figure* CreateFigure()=0;
+		virtual Figure* CreateFigure(std::string) = 0;
 };
 

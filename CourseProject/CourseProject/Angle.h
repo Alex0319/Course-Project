@@ -3,13 +3,16 @@ class Angle : public Figure
 {
 	public:
 		Angle();
+		Angle(std::string);
 		~Angle();
 		void DrawFigure(HDC, int, int,int);
 		int SetFigureOnChoosePlace(BlockColors(*)[BLOCKS_COUNT], int);
+		bool CheckBlock(BlockColors(*)[BLOCKS_COUNT], int);
 		int GetBlocksCountInColumn();
 		int GetBlocksCountInRow();
+		std::string GetFigureProperties();
 	protected:
-		bool CheckPlace(BlockColors(*)[BLOCKS_COUNT], int, int, int, int);
+		bool Check(BlockColors(*)[BLOCKS_COUNT], int, int, int, int);
 		int SetFigure(BlockColors(*)[BLOCKS_COUNT], int, int, int, int);
 	private:
 		enum AngleType

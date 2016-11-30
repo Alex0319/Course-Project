@@ -2,25 +2,37 @@
 
 PlayingField::PlayingField()
 {
-	fieldState = CREATE;
+	gameRecord = gameInfo.LoadGameRecord();
 	figureFactories.push_back(new SquareFactory);
 	figureFactories.push_back(new HorizontalLineFactory);
 	figureFactories.push_back(new VerticalLineFactory);
 	figureFactories.push_back(new AngleFactory);
 	fieldRect = { BLOCK_SIZE, FIELD_START, BLOCK_SIZE*(BLOCKS_COUNT + 1), PLAYING_FIELD };
 	hPen = GetStockPen(NULL_PEN);
-	for (int i = 0; i < BLOCKS_COUNT;i++)
-		for (int j = 0; j < BLOCKS_COUNT; j++)
-			blockTable[i][j] = DEFAULT;
+	if (!(currentNumberOfOccupiedBlocks = gameInfo.TryLoadGameInfo(blockTable,figures,figureFactories,&gameInfo,&currentScore)))
+		InitializeNewGame();
+	else
+		fieldState = DRAWSAVED;
 }
 
 PlayingField::~PlayingField()
 {
 	DeleteObject(hPen);
+	gameInfo.SaveGameInfo(blockTable, figures,currentScore);
+	gameInfo.SaveGameRecord(gameRecord);
 	ClearFiguresVector();
 	for (auto it = figureFactories.begin(); it != figureFactories.end();it++)
 		delete *it;
 	figureFactories.clear();
+}
+
+void PlayingField::InitializeNewGame()
+{
+	for (int i = 0; i < BLOCKS_COUNT; i++)
+		for (int j = 0; j < BLOCKS_COUNT; j++)
+			blockTable[i][j] = DEFAULT;
+	fieldState = CREATE;
+	currentNumberOfOccupiedBlocks = currentScore = 0;
 }
 
 int PlayingField::SearchFullRows()
@@ -34,7 +46,7 @@ int PlayingField::SearchFullRows()
 		if (j == BLOCKS_COUNT)
 		{
 			for (j = 0; j < BLOCKS_COUNT; j++)
-				blockTable[i][j] = DEFAULT;
+				blockTable[i][j] = DELETECOLOR;
 			blocksCount += BLOCKS_COUNT;
 		}
 	}
@@ -47,16 +59,59 @@ int PlayingField::SearchFullColumns()
 	for (int j = 0; j < BLOCKS_COUNT; j++)
 	{
 		for (i = 0; i< BLOCKS_COUNT; i++)
-		if (blockTable[i][j] == DEFAULT)
-			break;
-		if (j == BLOCKS_COUNT)
+			if (blockTable[i][j] == DEFAULT)
+				break;
+		if (i == BLOCKS_COUNT)
 		{
-			for (j = 0; j < BLOCKS_COUNT; j++)
-				blockTable[i][j] = DEFAULT;
+			for (i = 0; i < BLOCKS_COUNT; i++)
+				blockTable[i][j] = DELETECOLOR;
 			blocksCount += BLOCKS_COUNT;
 		}
 	}
 	return blocksCount;
+}
+
+int PlayingField::ClearFullRowsAndColumns()
+{
+	int result = SearchFullRows() + SearchFullColumns();
+	for (int i = 0; i < BLOCKS_COUNT; i++)
+		for (int j = 0; j < BLOCKS_COUNT; j++)
+			if (blockTable[i][j] == DELETECOLOR)
+				blockTable[i][j] = DEFAULT;
+	return result;
+}
+
+bool PlayingField::CheckEmptyCells()
+{
+	if (currentNumberOfOccupiedBlocks<BLOCKS_COUNT*BLOCKS_COUNT / 4)
+		return true;
+	if (figures.empty())
+		CreateNewFigures();
+	for (int i = 0; i < BLOCKS_COUNT;i++)
+		for (int j = 0; j < BLOCKS_COUNT; j++)
+			if (blockTable[i][j]==DEFAULT)
+				for (auto k = 0; k < figures.size();k++)
+					if (figures[k]->CheckBlock(blockTable, i*BLOCKS_COUNT + j))
+						return true;
+	return false;
+}
+
+void PlayingField::UpdateGameValues(int countOfSetBlocks, int countOfFreedBlocks)
+{
+	currentScore += countOfSetBlocks + countOfFreedBlocks;
+	currentNumberOfOccupiedBlocks += countOfSetBlocks - countOfFreedBlocks;
+}
+
+int PlayingField::GetCurrentScore()
+{
+	return currentScore;
+}
+
+int PlayingField::GetGameRecord()
+{
+	if (gameRecord < currentScore)
+		gameRecord = currentScore;
+	return gameRecord;
 }
 
 void PlayingField::ClearFiguresVector()
@@ -65,16 +120,20 @@ void PlayingField::ClearFiguresVector()
 		delete *it;
 	if (!figures.empty())
 		std::vector<Figure*>().swap(figures);
+	gameInfo.Clear();
+	oldFigureStartPoint.x = 0;
+	oldFigureStartPoint.y = 0;
 }
 
 void PlayingField::RemoveFigure()
 {
-	for (int i = 0; i < figures.size();i++)
+	for (auto i = 0; i < figures.size();i++)
 		if (chooseFigure == figures[i])
 		{
 			figures.erase(figures.begin() + i);
 			if (!figures.empty())
 				std::vector<Figure*>(figures).swap(figures);
+			gameInfo.ClearFigureIndex(i);
 		}
 }
 
@@ -95,7 +154,7 @@ void PlayingField::PaintPlayingField(HDC hdc)
 
 bool PlayingField::CheckClientClick(POINT point)
 {
-	for (int i = 0; i < figures.size(); i++)
+	for (auto i = 0; i < figures.size(); i++)
 		if (PtInRect(&(figures[i]->GetFigureRect()), point))
 		{
 			chooseFigure = figures[i];
@@ -113,7 +172,7 @@ bool PlayingField::CheckFigureChoose()
 
 void PlayingField::RepaintOtherFigures(HDC hdc)
 {
-	for (int i=0; i<figures.size(); i++)
+	for (auto i=0; i<figures.size(); i++)
 		if (chooseFigure == NULL || chooseFigure != figures[i])
 		{
 			RECT figureRect = figures[i]->GetFigureRect();
@@ -136,18 +195,19 @@ void PlayingField::RepaintChooseFigure(HDC hdc,int mouseX,int mouseY)
 	}
 }
 
-void PlayingField::CreateNewFigures(HDC hdc)
+void PlayingField::CreateNewFigures()
 {
 	srand(time(0));
 	ClearFiguresVector();
 	int currentX = BLOCK_SIZE_SMALL, currentY = PLAYING_FIELD;
-	for (int i = 0; i < newFiguresCount; i++)
+	for (int i = 0; i < NEW_FIGURES_COUNT; i++)
 	{
-		figures.push_back(figureFactories[rand() % figureFactories.size()]->CreateFigure());
+		int figureIndex = rand() % figureFactories.size();
+		figures.push_back(figureFactories[figureIndex]->CreateFigure());
+		gameInfo.SetFigureIndex(figureIndex);
 		currentX += (NEW_FIGURE_WIDTH - BLOCK_SIZE_SMALL*figures.back()->GetBlocksCountInRow()) / 2;
-		int a = NEW_FIGURE_HEIGHT - BLOCK_SIZE_SMALL*figures.back()->GetBlocksCountInColumn();
 		currentY += (NEW_FIGURE_HEIGHT - BLOCK_SIZE_SMALL*figures.back()->GetBlocksCountInColumn()) / 4;
-		figures.back()->DrawFigure(hdc, currentX, currentY, BLOCK_SIZE_SMALL);
+		figures.back()->SetRectStartPoint(currentX, currentY);
 		currentX = BLOCK_SIZE_SMALL + (i + 1)*NEW_FIGURE_WIDTH;
 		currentY = PLAYING_FIELD;
 	}
@@ -195,7 +255,7 @@ int PlayingField::SearchStartBlockNumberForChooseFigure(RECT startFigureBlockRec
 	return blockNumber;
 }
 
-int PlayingField::GetStartBlockNumberForChooseFigure(RECT figureRect,int x,int y)
+int PlayingField::GetStartBlockNumberForChooseFigure(RECT figureRect)
 {
 	RECT startFigureBlockRect = { figureRect.left, figureRect.bottom - BLOCK_SIZE, figureRect.left + BLOCK_SIZE, figureRect.bottom };
 	int currentX = SearchMaxCloseValue(startFigureBlockRect.left, fieldRect.left), currentY = SearchMaxCloseValue(startFigureBlockRect.top, fieldRect.top);
@@ -203,46 +263,56 @@ int PlayingField::GetStartBlockNumberForChooseFigure(RECT figureRect,int x,int y
 	return blockNumber;
 }
 
-void PlayingField::TrySetChoosingFigure(int x, int y)
+bool PlayingField::TrySetChoosingFigure()
 {
 	if (chooseFigure != NULL)
 	{
 		int blockNumber = 0,setBlockCount=0;
 		if (chooseFigure->CheckPlaceForFigure(fieldRect))
 		{
-			blockNumber = GetStartBlockNumberForChooseFigure(chooseFigure->GetFigureRect(), x, y);
-			if (setBlockCount=chooseFigure->SetFigureOnChoosePlace(blockTable, blockNumber))
+			blockNumber = GetStartBlockNumberForChooseFigure(chooseFigure->GetFigureRect());
+			if (setBlockCount = chooseFigure->SetFigureOnChoosePlace(blockTable, blockNumber))
 			{
-				setBlockCount += SearchFullRows() + SearchFullColumns();
+				UpdateGameValues(setBlockCount, ClearFullRowsAndColumns());
 				RemoveFigure();
+				delete chooseFigure;
+				chooseFigure = NULL;
+				if (!CheckEmptyCells())
+					return false;
 				if (figures.empty())
 					fieldState = CREATE;
 			}
 		}
-		chooseFigure->SetRectStartPoint(oldFigureStartPoint.x, oldFigureStartPoint.y);
+		if (chooseFigure != NULL)
+		{
+			chooseFigure->SetRectStartPoint(oldFigureStartPoint.x, oldFigureStartPoint.y);
+			chooseFigure = NULL;
+		}
 		oldFigureStartPoint.x = 0;
 		oldFigureStartPoint.y = 0;
-		chooseFigure = NULL;
 	}
+	return true;
 }
 
 void PlayingField::UpdatePlayingField(HDC hdc,int x,int y)
 {
 	HPEN oldPen = SelectPen(hdc, hPen);
+	PaintPlayingField(hdc);
 	switch (fieldState)
 	{
-		case CREATE:
-			PaintPlayingField(hdc);
-			CreateNewFigures(hdc);
-			fieldState = REPAINT;
+		case CREATE: 
+			CreateNewFigures();
+			RepaintOtherFigures(hdc);
 			break;
 		case REPAINT:
-			PaintPlayingField(hdc);
 			RepaintOtherFigures(hdc);
 			RepaintChooseFigure(hdc, x, y);
+			break;
+		case DRAWSAVED:	RepaintOtherFigures(hdc);
 			break;
 		default:
 			break;
 	}
+	fieldState = REPAINT;
 	SelectPen(hdc, oldPen);
 }
